@@ -172,6 +172,10 @@
               <td>October 9, 2026</td>
             </tr>
             <tr>
+              <td>Provider and speech amendment</td>
+              <td>October 15, 2026. Not published. Attorney review is still required.</td>
+            </tr>
+            <tr>
               <td>Service</td>
               <td>FinancePilot (limited external beta)</td>
             </tr>
@@ -297,18 +301,16 @@
       <p>
         If you use optional <strong>push-to-talk</strong> coworker voice
         commands, FinancePilot requests microphone and speech-recognition
-        permission. Audio is captured so that speech can be turned into text
-        commands. FinancePilot does <strong>not</strong> send raw microphone
-        audio to Google Gemini.
+        permission. Audio is captured so that speech can be turned into text.
+        FinancePilot does <strong>not</strong> request on-device-only
+        recognition. <strong>Apple’s speech recognition service may process the
+        audio off this device.</strong> FinancePilot does <strong>not</strong>
+        send that recording to OpenAI or to Google Gemini.
       </p>
       <p>
-        FinancePilot prefers <strong>on-device</strong> transcription when the
-        platform provides it. Depending on the device, operating system, and
-        platform speech services, some speech recognition may still be processed
-        by the platform provider (for example, Apple or Google speech services).
-        FinancePilot does not independently guarantee that every transcript is
-        produced solely on-device. Recognized text is shown for confirmation
-        before consequential coworker actions.
+        After you confirm the recognized text, that text can be included in an
+        AI Coworker request described in §3B. It is sent as text, not as audio.
+        Recognized text is shown before a coworker action that uses it.
       </p>
 
       <h2>3. How information is used</h2>
@@ -330,6 +332,15 @@
         user-facing purposes.
       </p>
       <p>
+        When FinancePilot extracts fields from a receipt image or from receipt
+        text, it sends that image or text to <strong>Google Gemini (Gemini 2.5
+        Flash)</strong> through a FinancePilot server. That send can include the
+        receipt image or the receipt text. It is separate from the minimized Ask
+        observation and from AI Coworker, and it is <strong>not</strong> sent to
+        OpenAI. FinancePilot has <strong>not</strong> independently verified how
+        long Google keeps those extraction requests.
+      </p>
+      <p>
         Google user data is <strong>not sold</strong> and is
         <strong>not used for advertising</strong>.
       </p>
@@ -348,18 +359,22 @@
       <h3>3A. Optional AI expense analysis and preparation (Ask FinancePilot)</h3>
       <p>
         With your <strong>explicit, revocable consent</strong>, FinancePilot may
-        send a <strong>minimized expense observation</strong> to
-        <strong>Google Gemini</strong> (an AI processing provider operated by
-        Google) through a FinancePilot server for <strong>read-only</strong>
-        analysis and proposals only (for example, Ask FinancePilot
-        recommendations).
+        send a <strong>minimized expense observation</strong> through a
+        FinancePilot server for <strong>read-only</strong> analysis and
+        proposals (Ask FinancePilot). The server selects one provider for that
+        request. The default is <strong>OpenAI (GPT-4o mini)</strong> when that
+        credential is configured, and <strong>Google Gemini (Gemini 2.5 Flash)</strong>
+        otherwise. A server setting can force one of those two
+        providers. This notice does not state which setting is in force on a
+        particular day.
       </p>
       <p>
-        That observation may include the merchant, the amount, a confirmed
-        currency only when one is already recorded, a currency hint, evidence
-        ids, and open requirements. It does <strong>not</strong> include email
-        bodies, receipt images, attachments, OCR text, payment details, or other
-        personal information beyond those minimized fields.
+        That observation may include the expense id, the merchant, the amount, a
+        confirmed currency only when one is already recorded, a currency hint,
+        an evidence id and kind, and open requirements. It does
+        <strong>not</strong> include email bodies, receipt images, attachments,
+        OCR text, or payment details. This exclusion describes the Ask
+        observation only. It does not describe AI Coworker tool results in §3B.
       </p>
       <p>
         Eligible expenses include expenses imported from
@@ -367,10 +382,13 @@
         to your FinancePilot account.
       </p>
       <p>
-        <strong>Gemini cannot</strong> change your expenses, write to your data,
-        or execute actions. Only FinancePilot’s
-        <strong>Action Framework</strong> may perform authorized preparation
-        actions you have allowed:
+        On the Ask FinancePilot path described above, the model is not given a
+        write tool. A business-purpose change on that path still requires your
+        <strong>Approve</strong>. That sentence does <strong>not</strong>
+        describe AI Coworker. AI Coworker is described in §3B. The older Action
+        Framework is not the path AI Coworker uses to save a business purpose
+        or a classification. Where a preparation action is still offered for
+        your approval, FinancePilot may perform it only after you allow it:
       </p>
       <ul>
         <li>
@@ -391,9 +409,10 @@
         preparation steps may be <strong>rolled back</strong>.
       </p>
       <p>
-        On Google’s <strong>paid</strong> Gemini API path used for this feature,
-        Google’s published terms state that prompts and responses are
-        <strong>not</strong> used to improve Google products. This notice does
+        When the Ask provider for that request is Google Gemini on Google’s
+        <strong>paid</strong> Gemini API, Google’s published terms state that
+        prompts and responses are <strong>not</strong> used to improve Google
+        products. This notice does
         <strong>not</strong> claim that optional Google developer log datasets
         are shared or unshared with Google; that project setting is separate.
         Google may still keep prompts and responses for a
@@ -406,9 +425,10 @@
       </p>
       <p>
         You can <strong>revoke</strong> this consent at any time in
-        FinancePilot. Revocation stops further sends to Gemini and blocks
-        further autonomous preparation. It does not delete copies already
-        retained under Google’s or FinancePilot’s applicable retention limits.
+        FinancePilot. Revocation stops further Ask sends to the provider
+        selected for that request, and blocks further autonomous preparation.
+        It does not delete copies already retained under Google’s or
+        FinancePilot’s applicable retention limits.
         You may also request deletion of FinancePilot beta account and workspace
         data as described in §5.
       </p>
@@ -416,6 +436,73 @@
         This beta feature may be limited to explicitly enrolled accounts.
         Real-expense model transmission is disabled unless FinancePilot’s
         servers are separately configured to allow it.
+      </p>
+
+      <h3>3B. AI Coworker</h3>
+      <p>
+        <strong>Attorney review required.</strong> This section describes the
+        implemented AI Coworker. It is not a determination that the processing
+        is lawful, that OpenAI’s terms have been accepted for this use, or that
+        a particular retention setting is in force.
+      </p>
+      <p>
+        When you are enrolled, have given consent, and set a trip to
+        <strong>Auto</strong> with an active standing delegation, FinancePilot
+        can send expense and evidence fields to <strong>OpenAI</strong> through
+        a FinancePilot server. The server selects the model (currently GPT-4.1 mini).
+        The app does not let the model choose a different provider.
+        FinancePilot has <strong>not</strong> verified an OpenAI “do not train”
+        or zero-retention setting for this call. Do not treat this notice as
+        that verification.
+      </p>
+      <p>
+        The model can investigate trips and expenses and can request a supported
+        change. FinancePilot’s server, not the model, decides whether the change
+        is allowed. The only autonomous changes this beta can persist are:
+      </p>
+      <ul>
+        <li>
+          adding a business purpose that is bound to your statement or to
+          evidence already stored for that expense
+        </li>
+        <li>
+          classifying an expense as business or personal when the stored
+          evidence supports that classification
+        </li>
+      </ul>
+      <p>
+        The model must not invent an amount, a currency, a receipt, or a
+        business purpose. A tool result can include a short excerpt of stored
+        email or receipt text, such as a subject, snippet, preview, or summary.
+        Email addresses in that excerpt are redacted. The result does not
+        include the receipt image or the full mailbox. That excerpt is evidence.
+        It is not an instruction that can override your account, your operating
+        mode, or the server’s rules.
+      </p>
+      <p>
+        AI Coworker does <strong>not</strong> submit a report to Concur, change
+        an amount, clear a trust hold, or permanently delete expenses, receipts,
+        reports, or your account. Preparing a reviewable report, including an
+        incomplete report that lists exceptions, is not a submission.
+      </p>
+      <p>
+        <strong>Manual</strong> does not send a model call. <strong>Assist</strong>
+        can investigate and does not autonomously write. <strong>Auto</strong>
+        can write only when enrollment, consent, a standing grant, the trip
+        scope, the action type, the operation budget, and the server write
+        switch all allow it. A standing grant alone is not permission. A global
+        emergency stop turns autonomous writes off for every account.
+      </p>
+      <p>
+        You can revoke consent and delegation in FinancePilot. Revocation stops
+        further model calls and further autonomous changes for that
+        authorization. It does not by itself erase prior audit records or prior
+        expense evidence.
+      </p>
+      <p>
+        Enrollment is an explicit list of accounts and trips. Turning on AI
+        Coworker for one tester does not turn it on for every FinancePilot
+        account.
       </p>
 
       <h2>4. Where information is kept</h2>
@@ -478,10 +565,26 @@
       <h3>Optional AI consent</h3>
       <p>
         Revoking optional AI / coworker consent in FinancePilot stops further
-        Gemini sends and further autonomous preparation for that consent. It may
+        model sends and further autonomous preparation for that consent. It may
         <strong>not</strong> by itself delete previously imported workspace
-        data, prior audit records, or copies retained by Google under the limits
-        described in §3A.
+        data, prior audit records, or copies a model provider has already
+        retained. Gemini handling is described in §3A. AI Coworker handling is
+        described in §3B. Neither section states a verified provider retention
+        period.
+      </p>
+      <p>
+        Ordinary removal of an expense hides it from active reports and keeps
+        the associated receipt recoverable by that account for
+        <strong>30 days</strong>. That window is configurable on the server.
+        After it ends, the app will not restore the expense. An authorized
+        cleanup job then removes the receipt file and the recovery record. That
+        job is not a backup, and it does not delay an explicit permanent
+        deletion or deletion of the whole account. Permanent deletion asks the
+        user to sign in again; a refreshed session is not enough. AI Coworker
+        cannot make either request. A database backup, if the operator has one,
+        is not a promise that a deleted receipt can be restored.
+        <strong>Attorney review required</strong> before this retention sentence
+        is given to a tester.
       </p>
       <p>
         Users may request deletion of FinancePilot beta account and workspace
@@ -492,24 +595,26 @@
       <h2>6. Service providers</h2>
       <p>
         FinancePilot may use infrastructure and storage providers (including
-        Supabase) and AI service providers (including
-        <strong>Google Gemini</strong> for optional, consented, read-only
-        expense analysis and proposals as described in §3A) as necessary to
-        provide the service. Authorized preparation actions are executed only by
-        FinancePilot’s Action Framework under your consent and product controls
-        — not by Gemini directly.
+        Supabase) and AI service providers. <strong>Google Gemini</strong> is
+        described in §3A and for receipt extraction. <strong>OpenAI</strong> is
+        described in §3B for AI Coworker. Those sections are not a completed
+        processor agreement. Providers are used as necessary to provide the
+        service. Authorized preparation changes are executed by FinancePilot’s
+        server under your consent and the controls in §3A and §3B. The model
+        provider does not receive a direct write to your expenses.
       </p>
       <p>
-        Platform speech providers (for example, Apple or Google speech services)
-        may process voice audio or transcripts when you use push-to-talk, as
-        described in §2.
+        Apple’s speech recognition service may process voice audio when you use
+        push-to-talk, as described in §2. FinancePilot does not send that
+        recording to OpenAI or to Google Gemini.
       </p>
 
       <h2>7. Security</h2>
       <p>
         FinancePilot uses account authentication, user-scoped access controls,
-        and server-side handling of model API credentials for the optional
-        Gemini path described in §3A. This notice does <strong>not</strong>
+        and server-side handling of model API credentials for receipt
+        extraction, Ask FinancePilot, and AI Coworker. This notice does
+        <strong>not</strong>
         claim a specific encryption standard, geographic processing region for
         FinancePilot infrastructure, or certification beyond what is stated
         here.
@@ -531,8 +636,8 @@
       </p>
       <hr />
       <p>
-        <em>FinancePilot limited external beta privacy notice. Build 45
-        amendment dated October 9, 2026.</em>
+        <em>FinancePilot limited external beta privacy notice. Provider and
+        speech amendment dated October 15, 2026. Not published.</em>
       </p>
       <div class="contact-box">
         <strong>Contact</strong><br />
